@@ -19,10 +19,16 @@ function findBy(filter) {
 }
 
 async function register(user) {
-    const [id] = await db('users')
-    .insert(user);
+    const profile = {
+		username: user.username
+	};
+    const [id] = await db('Users')
+    .insert(user, 'id');
 
-    return findById(id);
+    const userProfile = await db('profiles')
+    .insert(profile, 'username');
+
+	return findById(id);
 }
 
 function findById(id) {
