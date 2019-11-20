@@ -59,11 +59,6 @@ Tables Content:
 | countUsers  | integer | yes      | no     | Number of people on trip |
 | folksPaid   | integer | no       | no     | Number of people that paid |
 
-### User Expenses
-
-| Name              | Type    | Required | Unique | Notes |
-| ----------------- | ------  | -------- | ------ | ----- |
-
 
 
 ## API Endpoints
@@ -71,6 +66,7 @@ Endpoints Content:
 - [Login](#Login)
 - [Registration](#Registration)
 - [Profile](#Profile)
+- [Trips](#Trips)
 - [Expenses](#Expenses)
 
 
@@ -118,5 +114,61 @@ If any of the required fields are missing, it will reject the request with a `40
 If successful, it will return with a `200` HTTP status.
 
 
-*****MORE TO BE ADDED SOON*****
+### Profile
+https://bw-trip-split.herokuapp.com/api/profile/:id
+
+Expects an object with this format as the request body:
+```
+  --header "Content-Type: application/json"
+  --data: 
+{
+	profile_id: 1, 
+	username: 'test1', 
+	first_name:'Name 1', 
+	last_name: 'Last 1'
+}
+```
+
+
+### Trips
+https://bw-trip-split.herokuapp.com/api/trips
+
+To update if completed:
+https://bw-trip-split.herokuapp.com/api/trips/:id/updateStatus
+
+To add a trip:
+https://bw-trip-split.herokuapp.com/api/trips/addTrip
+
+Expects an object with this format as the request body:
+
+```
+  --header "Content-Type: application/json"
+  --data: 
+{
+	trip_id: 1,
+	destination: 'Test Place 1',
+	description: 'Test Trip 1',
+	create_trip: 1,
+	trip_start: Date.now()
+}
+```
+
+
+### Expenses
+https://bw-trip-split.herokuapp.com/api/:tripid/expenses/
+
+Expects an object with this format as the request body:
+
+```
+  --header "Content-Type: application/json"
+  --data: 
+{
+	expense_id: 1,
+	trip_id: 3,
+	description: 'Test 1',
+	amount: 1
+}
+```
+
+
 
