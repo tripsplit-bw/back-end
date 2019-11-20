@@ -1,7 +1,6 @@
 const express = require('express');
 const Trips = require('../trips/trips-model');
 const TripExpenses = require('../expenses/expenses-model');
-const TripMembers = require('../expenses/memberexp-model');
 const authmd = require('../auth/authenticate-middleware');
 
 const router = express.Router();
@@ -18,74 +17,74 @@ router.get('/', authmd, async (req, res) => {
 	}
 });
 
-router.get('/:id', authmd, async (req, res) => {
-	const id = req.params.id;
+// router.get('/:id', authmd, async (req, res) => {
+// 	const id = req.params.id;
 
-	try {
-		const trip = await Trips.getTripById(id);
-		if (trip) {
-			const tripMembers = await TripMembers.getTripMembers(id);
+// 	try {
+// 		const trip = await Trips.getTripById(id);
+// 		if (trip) {
+// 			const tripMembers = await TripMembers.getTripMembers(id);
 
-			res.status(200).json(trip);
-		} else {
-			res.status(404).json({ message: 'trip not found' });
-		}
-	} catch (err) {
-		res.status(500).json(err);
-	}
-});
+// 			res.status(200).json(trip);
+// 		} else {
+// 			res.status(404).json({ message: 'trip not found' });
+// 		}
+// 	} catch (err) {
+// 		res.status(500).json(err);
+// 	}
+// });
 
-router.get('/:id/members', authmd, async (req, res) => {
-	const id = req.params.id;
+// router.get('/:id/members', authmd, async (req, res) => {
+// 	const id = req.params.id;
 
-	try {
-		let tripMembers = await TripMembers.getTripMembers(id);
-		res.status(200).json(tripMembers);
-	} catch (error) {
-		res.status(500).json({ error });
-	}
-});
+// 	try {
+// 		let tripMembers = await TripMembers.getTripMembers(id);
+// 		res.status(200).json(tripMembers);
+// 	} catch (error) {
+// 		res.status(500).json({ error });
+// 	}
+// });
 
-router.post('/:id/members', authmd, async (req, res) => {
-	const id = req.params.id;
-	let { username } = req.body;
+// router.post('/:id/members', authmd, async (req, res) => {
+// 	const id = req.params.id;
+// 	let { username } = req.body;
 
-	if (username) {
-		try {
-			let tripMembers = await TripMembers.addMemberToTrip(id, username);
-			res.status(201).json(tripMembers);
-		} catch (error) {
-			res.status(500).json(error);
-		}
-	} else {
-		res.status(400).json({
-			message: 'Needs username'
-		});
-	}
-});
+// 	if (username) {
+// 		try {
+// 			let tripMembers = await TripMembers.addMemberToTrip(id, username);
+// 			res.status(201).json(tripMembers);
+// 		} catch (error) {
+// 			res.status(500).json(error);
+// 		}
+// 	} else {
+// 		res.status(400).json({
+// 			message: 'Needs username'
+// 		});
+// 	}
+// });
 
 
-router.delete(':/id/members', authmd, async (req, res) => {
-	const trip_id = req.params.id;
-	let { username } = req.body;
+// router.delete(':/id/members', authmd, async (req, res) => {
+// 	const trip_id = req.params.id;
+// 	let { username } = req.body;
 
-	if (username) {
-		try {
-			let tripMembers = await TripMembers.removeMemberFromTrip(
-				trip_id,
-				username
-			);
-			res.status(201).json(tripMembers);
-		} catch (error) {
-			res.status(500).json(error);
-		}
-	} else {
-		res.status(400).json({
-			message:
-				'missing username'
-		});
-	}
-});
+// 	if (username) {
+// 		try {
+// 			let tripMembers = await TripMembers.removeMemberFromTrip(
+// 				trip_id,
+// 				username
+// 			);
+// 			res.status(201).json(tripMembers);
+// 		} catch (error) {
+// 			res.status(500).json(error);
+// 		}
+// 	} else {
+// 		res.status(400).json({
+// 			message:
+// 				'missing username'
+// 		});
+// 	}
+// });
 
 
 router.get('/:id/updateStatus', authmd, async (req, res) => {
