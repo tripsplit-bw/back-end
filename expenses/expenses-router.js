@@ -1,6 +1,5 @@
 const express = require("express");
 const Expenses = require("../expenses/expenses-model");
-const ExpenseMembers = require('../expenses/memberexp-model');
 const authmw = require('../auth/authenticate-middleware');
 
 const router = express.Router({ mergeParams: true });
@@ -31,95 +30,95 @@ router.get("/:id", authmw, async (req, res) => {
 });
 
 // Get members who belong to that expense via expense id.
-router.get("/:id/members", authmw, async (req, res) => {
-	const id = req.params.id;
+// router.get("/:id/members", authmw, async (req, res) => {
+// 	const id = req.params.id;
 
-	try {
-		let expMembers = await ExpenseMembers.getExpenseMembers(id);
+// 	try {
+// 		let expMembers = await ExpenseMembers.getExpenseMembers(id);
 
-		res.status(200).json(expMembers);
-	} catch (err) {
-		res.status(500).json(err);
-	}
-});
+// 		res.status(200).json(expMembers);
+// 	} catch (err) {
+// 		res.status(500).json(err);
+// 	}
+// });
 
 // Add members to specific expense via expense id. Requires username of registered user.
-router.post("/:id/members", authmw, async (req, res) => {
-	const expense_id = req.params.id;
-	const trip_id = req.params.tripid;
+// router.post("/:id/members", authmw, async (req, res) => {
+// 	const expense_id = req.params.id;
+// 	const trip_id = req.params.tripid;
 
-	let { username } = req.body;
+// 	let { username } = req.body;
 
-	if (username) {
-		try {
-			let newExpMemList = await ExpenseMembers.addMemberToExpense(
-				expense_id,
-				trip_id,
-				username
-			);
+// 	if (username) {
+// 		try {
+// 			let newExpMemList = await ExpenseMembers.addMemberToExpense(
+// 				expense_id,
+// 				trip_id,
+// 				username
+// 			);
 
-			res.status(201).json(newExpMemList);
-		} catch (err) {
-			res.status(500).json({ err });
-		}
-	} else {
-		res.status(400).json({
-			message: "A username is required to add a friend to an expense."
-		});
-	}
-});
+// 			res.status(201).json(newExpMemList);
+// 		} catch (err) {
+// 			res.status(500).json({ err });
+// 		}
+// 	} else {
+// 		res.status(400).json({
+// 			message: "A username is required to add a friend to an expense."
+// 		});
+// 	}
+// });
 
 // Toggle specific individual's payment status on specific expense via expense id and individual's username.
-router.post("/:id/members/paid", authmw, async (req, res) => {
-	const expense_id = req.params.id;
-	const trip_id = req.params.tripid;
+// router.post("/:id/members/paid", authmw, async (req, res) => {
+// 	const expense_id = req.params.id;
+// 	const trip_id = req.params.tripid;
 
-	let { username } = req.body;
+// 	let { username } = req.body;
 
-	if (username) {
-		try {
-			let newExpMemList = await ExpenseMembers.boolPaidStatus(
-				expense_id,
-				trip_id,
-				username
-			);
+// 	if (username) {
+// 		try {
+// 			let newExpMemList = await ExpenseMembers.boolPaidStatus(
+// 				expense_id,
+// 				trip_id,
+// 				username
+// 			);
 
-			res.status(201).json(newExpMemList);
-		} catch (err) {
-			res.status(500).json({ err });
-		}
-	} else {
-		res.status(400).json({
-			message: "A username is required to update expense payment status."
-		});
-	}
-});
+// 			res.status(201).json(newExpMemList);
+// 		} catch (err) {
+// 			res.status(500).json({ err });
+// 		}
+// 	} else {
+// 		res.status(400).json({
+// 			message: "A username is required to update expense payment status."
+// 		});
+// 	}
+// });
 
-// Delete specific individual from specific expense via expense id and individual's username.
-router.delete("/:id/members", authmw, async (req, res) => {
-	const expense_id = req.params.id;
-	const trip_id = req.params.tripid;
+// // Delete specific individual from specific expense via expense id and individual's username.
+// router.delete("/:id/members", authmw, async (req, res) => {
+// 	const expense_id = req.params.id;
+// 	const trip_id = req.params.tripid;
 
-	let { username } = req.body;
+// 	let { username } = req.body;
 
-	if (username) {
-		try {
-			let itemToDel = await ExpenseMembers.removeMemberFromExpense(
-				expense_id,
-				trip_id,
-				username
-			);
+// 	if (username) {
+// 		try {
+// 			let itemToDel = await ExpenseMembers.removeMemberFromExpense(
+// 				expense_id,
+// 				trip_id,
+// 				username
+// 			);
 
-			res.status(200).json(itemToDel);
-		} catch (error) {
-			res.status(500).json(err);
-		}
-	} else {
-		res
-			.status(404)
-			.json({ message: "Must provide username to delete user from expense" });
-	}
-});
+// 			res.status(200).json(itemToDel);
+// 		} catch (error) {
+// 			res.status(500).json(err);
+// 		}
+// 	} else {
+// 		res
+// 			.status(404)
+// 			.json({ message: "Must provide username to delete user from expense" });
+// 	}
+// });
 
 // Add a new expense to a specific trip. Requires expense description and amount (integer) in request.
 router.post("/", authmw, async (req, res) => {
