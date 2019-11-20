@@ -48,8 +48,8 @@ router.post('/login', (req, res) => {
 			.first()
 			.then(user => {
 				if (user && bcrypt.compareSync(password, user.password)) {
-					// const token = tokenService.getJwt(user);
-					const token = getJwt(user.id);
+					const token = tokenService.getJwt(user);
+					// const token = getJwt(user.id);
 					res.status(200).json({
 						message: `Welcome, ${user.username}`,
 						token
