@@ -1,18 +1,13 @@
-const express = require('express');
+const router = require('express').Router();
+const Users = require('./users-model.js');
+const restricted = require('../auth/authenticate-middleware.js');
 
-const db = require('../data/dbConfig');
-
-const router = express.Router();
-
-router.get('/', (req, res) => {
-    db('users')
-    
-    .then(users => {
-        res.json(users);
-    })
-    .catch (err => {
-        res.status(500).json({ message: 'Failed to get users' });
-    });
+router.get('/', restricted, (req, res) => {
+    Users.findBy()
+        .then(users => {
+            res.json(users);
+        })
+        .catch(error => res.send(error));
 });
 
 router.get('/:id', (req, res) => {

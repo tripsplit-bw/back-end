@@ -1,6 +1,6 @@
 const express = require("express");
 const Expenses = require("../expenses/expenses-model");
-// const ExpenseMembers = require("../../models/expenseMembers-model");
+const ExpenseMembers = require('../expenses/memberexp-model');
 const authmw = require('../auth/authenticate-middleware');
 
 const router = express.Router({ mergeParams: true });

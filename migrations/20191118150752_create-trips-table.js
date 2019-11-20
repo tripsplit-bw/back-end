@@ -1,5 +1,5 @@
 exports.up = function(knex, Promise) {
-	return knex.schema.createTable('trips', tbl => {
+	return knex.schema.createTable('Trips', tbl => {
 		tbl.increments('trip_id');
 		tbl.string('destination', 256).notNullable();
 		tbl.string('description', 256).notNullable();
@@ -7,7 +7,7 @@ exports.up = function(knex, Promise) {
 		tbl
 			.integer('create_trip')
 			.references('id')
-			.inTable('Users')
+			.inTable('users')
 			.notNullable()
 			.onDelete('CASCADE')
 			.onUpdate('CASCADE');
@@ -20,5 +20,5 @@ exports.up = function(knex, Promise) {
 };
 
 exports.down = function(knex, Promise) {
-	return knex.schema.dropTableIfExists('trips');
+	return knex.schema.dropTableIfExists('Trips');
 };

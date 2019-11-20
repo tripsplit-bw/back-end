@@ -5,7 +5,8 @@ module.exports = {
 	addExToTrip,
 	findByTripId,
 	deleteExpense,
-	updateExpense
+	updateExpense,
+	boolPaidStatus
 };
 
 function findByExId(expense_id) {
@@ -34,7 +35,8 @@ async function addExToTrip(expense, authorName) {
 }
 
 async function findByTripId(trip_id) {
-	let tripex = await db('expenses').where('expenses.trip_id', trip_id);
+	let tripex = await db('expenses')
+	.where('expenses.trip_id', trip_id);
 
 	return tripex;
 }
@@ -56,4 +58,25 @@ async function updateExpense(expense_id, toBeNewExpense) {
 	let newExpense = await findByExId(expense_id);
 
 	return newExpense;
+}
+
+async function boolPaidStatus(expense_id, trip_id, username) {
+	const oldStatus = await db("expenseMembers")
+		.select("paid")
+		.where({
+			expense_id: expense_id,
+			username: username.toLowerCase(),
+			trip_id: trip_id
+		})
+		.first();
+
+	const newStatus = await db("expenseMembers")
+		.where({
+			expense_id: expense_id,
+			username: username.toLowerCase(),
+			trip_id: trip_id
+		})
+		.update("paid", !oldStatus.paid);
+
+	return getExpenseMembers(expense_id);
 }

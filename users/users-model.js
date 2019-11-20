@@ -19,14 +19,14 @@ function findBy(filter) {
 }
 
 async function register(user) {
-    const profile = {
-		username: user.username
-	};
-    const [id] = await db('Users')
-    .insert(user, 'id');
+    // const profile = {
+	// 	username: user.username
+	// };
+    const [id] = await db('users')
+    .insert(user);
 
-    const userProfile = await db('profiles')
-    .insert(profile, 'username');
+    // const userProfile = await db('profiles')
+    // .insert(profile, 'username');
 
 	return findById(id);
 }

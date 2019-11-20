@@ -4,65 +4,102 @@ const jwt = require('jsonwebtoken');
 
 const Users = require('../users/users-model');
 
-
+router.get('/', (req, res) => {
+    Users.find()
+    .then(users => {
+        res.status(200).json(users);
+    })
+    .catch(err => {
+        res.status(500).json({ message: 'Error fetching users!' });
+    });
+});
 
 router.post('/register', (req, res) => {
-    // implement registration
-    let user = req.body;
-    const result = validateUser(user);
+	let { username, password, email } = req.body;
 
-    if (result.isSuccessful) {
-        const hash = bcrypt.hashSync(user.password, 6);
-        user.password = hash;
-        
-        Users.register(user)
-            .then(user => {
-                const { id, email, username } = user;
-                res.status(200).json({ id, email, username });
-            })
-            .catch(() => {
-                res.status(500).json({ message: 'server error' });
-            });
-    } else {
-        res.status(400).json({
-            message: 'error with credentials entered',
-            error: result.errors
+	if (username && password && email) {
+		let user = req.body;
+		const hash = bcrypt.hashSync(user.password, 6);
+
+		user.password = hash;
+		user.username = user.username.toLowerCase();
+
+		Users.register(user)
+			.then(addsUser => {
+				res.status(201).json(addsUser);
+			})
+			.catch(err => {
+				res.send(err);
+			});
+	} else {
+		res.status(500).json({
+			message: 'username, password, and email required!'
+		});
+	}
+});
+
+
+router.post('/login', (req, res) => {
+	let { username, password } = req.body;
+	if (username && password) {
+		username = username.toLowerCase();
+		Users.findBy({ username })
+			.first()
+			.then(user => {
+				if (user && bcrypt.compareSync(password, user.password)) {
+					const token = tokenService.generateToken(user);
+					res.status(200).json({
+						message: `Welcome, ${user.username}`,
+						token
+					});
+
+				} else {
+					res
+						.status(401)
+						.json({ message: 'invalid credentials' });
+				}
+			})
+			.catch(err => {
+				res.status(500).json(err);
+			});
+	} else {
+		res
+			.status(500)
+			.json({ message: 'missing username or password' });
+	}
+});
+
+router.get('/logout', (req, res) => {
+    if (req.session) {
+        req.session.destroy(error => {
+            if (error) {
+                res
+                    .status(500)
+                    .json({
+                        message:
+                            'log out as needed'
+                    });
+            } else {
+                res.status(200).json({ message: 'logged out successfully' });
+            }
         });
+    } else {
+        res.status(200).json({ message: 'take care' });
     }
 });
 
-router.post('/login', (req, res) => {
-  // implement login
-    let { username, password } = req.body;
 
-    Users.findBy({ username })
-        .first()
-        .then(user => {
-            if (user && bcrypt.compareSync(password, user.password)) {
-                const token = getJwt(user.id);
-                console.log(token);
-                res.status(200).json({
-                    message: 'Hello', token
-                });
-            } else {
-                res.status(401).json({ message: 'shall not pass' });
-            }
-        })
-        .catch(() => {
-            res.status(500).json({ message: 'server error' });
-        });
-});
-
-function getJwt(id) {
+function getJwt(username) {
     const payload = {
-        id
+        username
     };
+
+    const secret = process.env.JWT_SECRET || 'is it secret, is it safe?';
 
     const options = {
         expiresIn: '1d'
     };
 
-    const secret = 'keep it secret, keep it safe';
     return jwt.sign(payload, secret, options);
 }
 

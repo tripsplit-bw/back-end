@@ -1,5 +1,5 @@
 exports.up = function(knex, Promise) {
-	return knex.schema.createTable('profile', tbl => {
+	return knex.schema.createTable('Profiles', tbl => {
 		tbl.increments('profile_id');
 		tbl
 			.string('username')
@@ -11,10 +11,10 @@ exports.up = function(knex, Promise) {
 		tbl
 			.foreign('username')
 			.references('username')
-			.inTable('Users');
+			.inTable('users');
 	});
 };
 
 exports.down = function(knex, Promise) {
-	return knex.schema.dropTableIfExists('profile');
+	return knex.schema.dropTableIfExists('Profiles');
 };

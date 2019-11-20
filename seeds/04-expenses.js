@@ -1,10 +1,10 @@
 exports.seed = function(knex, Promise) {
 	// Deletes ALL existing entries
-	return knex('expenses')
+	return knex('Expenses')
 		.truncate()
 		.then(function() {
 			// Inserts seed entries
-			return knex('expenses').insert([
+			return knex('Expenses').insert([
 				{
 					expense_id: 1,
 					trip_id: 3,

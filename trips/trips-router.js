@@ -1,7 +1,7 @@
 const express = require('express');
 const Trips = require('../trips/trips-model');
 const TripExpenses = require('../expenses/expenses-model');
-const TripMembers = require('../expenses/memberExpenses-model');
+const TripMembers = require('../expenses/memberexp-model');
 const authmd = require('../auth/authenticate-middleware');
 
 const router = express.Router();
