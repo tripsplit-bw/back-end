@@ -1,21 +1,21 @@
 const db = require('../data/dbConfig');
 
 module.exports = {
-	findByExId,
-	addExToTrip,
+	findByExpenseId,
+	addExpenseToTrip,
 	findByTripId,
 	deleteExpense,
 	updateExpense,
 	boolPaidStatus
 };
 
-function findByExId(expense_id) {
+function findByExpenseId(expense_id) {
 	return db('expenses')
 		.where({ expense_id })
 		.first();
 }
 
-async function addExToTrip(expense, authorName) {
+async function addExpenseToTrip(expense, authorName) {
 	let { trip_id } = expense;
 	let [ExID] = await db('expenses')
 	.insert(expense, 'expense_id');
@@ -26,7 +26,7 @@ async function addExToTrip(expense, authorName) {
 		trip_id: trip_id,
 		expense_id: ExID
 	};
-	let exMemberCreator = await db('expenseMembers')
+	let expenseCreator = await db('expenseMembers')
 	.insert(expenseMemberObj,'id');
 
 	let ExRes = await findByExId(ExID);
@@ -61,8 +61,8 @@ async function updateExpense(expense_id, toBeNewExpense) {
 }
 
 async function boolPaidStatus(expense_id, trip_id, username) {
-	const oldStatus = await db("expenseMembers")
-		.select("paid")
+	const oldStatus = await db('expenseMembers')
+		.select('paid')
 		.where({
 			expense_id: expense_id,
 			username: username.toLowerCase(),
@@ -70,13 +70,13 @@ async function boolPaidStatus(expense_id, trip_id, username) {
 		})
 		.first();
 
-	const newStatus = await db("expenseMembers")
+	const newStatus = await db('expenseMembers')
 		.where({
 			expense_id: expense_id,
 			username: username.toLowerCase(),
 			trip_id: trip_id
 		})
-		.update("paid", !oldStatus.paid);
+		.update('paid', !oldStatus.paid);
 
 	return getExpenseMembers(expense_id);
 }

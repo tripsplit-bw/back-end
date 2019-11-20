@@ -28,14 +28,14 @@ describe('POST /register', () => {
         it('needs to return 200 OK', async () => {
             const res = await request(server)
                 .post('/api/auth/register')
-                .send({ username: 'test1', password: 'password1' });
+                .send({ username: 'test21', password: 'password21' });
             expect(res.status).toBe(200);
         });
 
         it('validates', async () => {
             const res = await request(server)
                 .post('/api/auth/register')
-                .send({ username: 'test1', password: 'password1' });
+                .send({ username: 'test21', password: 'password21' });
             expect(res.body.error).toBe(undefined);
         });
     });
@@ -46,14 +46,14 @@ describe('POST /login', () => {
         it('needs to return 200 OK', async () => {
             const res = await request(server)
                 .post('/api/auth/login')
-                .send({ username: 'test1', password: 'password1' });
+                .send({ username: 'test21', password: 'password21' });
             expect(res.status).toBe(200);
         });
 
         it('returns json', async () => {
             const res = await request(server)
             .post('/api/auth/login')
-            .send({ username: 'test1', password: 'password1' });
+            .send({ username: 'test21', password: 'password21' });
             expect(res.type).toMatch(/json/i);
         });
     });
