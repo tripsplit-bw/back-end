@@ -15,6 +15,17 @@ router.get('/', (req, res) => {
     });
 });
 
+
+router.get('/profile', (req, res) => {
+    Users.find(profiles)
+    .then(profile => {
+        res.status(200).json(profile);
+    })
+    .catch(err => {
+        res.status(500).json({ message: 'Error fetching profiles!' });
+    });
+});
+
 router.post('/register', (req,res) => {
 	let user = req.body;
 	const hash = bcrypt.hashSync(user.password, 10)
@@ -25,7 +36,11 @@ router.post('/register', (req,res) => {
 			const token = getJwt(user);
 			res.status(201).json({
 			token,
-			message: `Welcome ${user.username}`
+			message: `Welcome ${user.username}`,
+			id: user.id,
+			username: user.username,
+			first_name: user.first_name,
+			last_name: user.last_name
 			});
 		})
 			.catch(err => {
@@ -49,7 +64,10 @@ router.post('/login', (req, res) => {
 					res.status(200).json({
 						message: `Welcome, ${user.username}`,
 						token,
-						id: user.id
+						id: user.id,
+						username: user.username,
+						first_name: user.first_name,
+						last_name: user.last_name
 					});
 				} else {
 					res
@@ -111,8 +129,8 @@ function getJwt(user) {
 
     };
 
-    const secret = process.env.JWT_SECRET || 'is it secret, is it safe?';
-
+    const secret = process.env.JWT_SECRET || 'keep it secret, keep it safe';
+	console.log(secret);
     const options = {
         expiresIn: '1d'
     };

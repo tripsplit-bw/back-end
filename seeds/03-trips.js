@@ -11,7 +11,8 @@ exports.seed = function(knex, Promise) {
 					close_trip: false,
 					trip_name: 'Test Trip 1',
 					trip_start: Date.now(),
-					trip_end: Date.now()
+					trip_end: Date.now(),
+					user_id: 1
 				},
 				{
 					trip_id: 2,
@@ -19,7 +20,8 @@ exports.seed = function(knex, Promise) {
 					close_trip: false,
 					trip_name: 'Test Trip 2',
 					trip_start: Date.now(),
-					trip_end: Date.now()
+					trip_end: Date.now(),
+					user_id: 2
 				},
 				{
 					trip_id: 3,
@@ -27,7 +29,8 @@ exports.seed = function(knex, Promise) {
 					close_trip: false,
 					trip_name: 'Test Trip 3',
 					trip_start: Date.now(),
-					trip_end: Date.now()
+					trip_end: Date.now(),
+					user_id: 3
 				}
 			]);
 		});

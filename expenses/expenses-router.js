@@ -1,14 +1,14 @@
 const express = require('express');
-const Expenses = require('./expenses-model');
+const Expense = require('./expenses-model');
 const authmw = require('../auth/authenticate-middleware');
 
 const router = express.Router();
 
 router.get('/', authmw, async (req, res) => {
-	Expenses
+	Expense
 		.find()
-		.then(expense => {
-			res.json(expense)
+		.then(Expenses => {
+			res.json(Expenses)
 		})
     .catch(err => {
 		res.status(500).json({ err });
@@ -16,6 +16,8 @@ router.get('/', authmw, async (req, res) => {
 });
 
 router.get('/:id', authmw, async (req, res) => {
+	const { id } = req.params;
+	
 	Expense
     .findMembers(id)
     .then(expense => {
@@ -49,21 +51,21 @@ router.get('/:id', authmw, async (req, res) => {
 router.post('/', authmw, async (req, res) => {
 	let expense = req.body;
 
-	Expenses
+	Expense
 		.addExpense(expense)	
 		.then(expense =>{
 			res.status(200).json(expense)
 		})
 		.catch (err => {
 			res.status(500).json(err);
-		})
+		}) 
 });
 
 
 router.delete('/:id', authmw, async (req, res) => {
 	const id = req.params;
 
-	Expenses
+	Expense
 		.deleteExpense(id)
 		.then(expense => {
 			res.status(200).json(expense)
