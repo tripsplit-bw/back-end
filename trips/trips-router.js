@@ -19,7 +19,7 @@ router.get('/', authmd, async (req, res) => {
 
 router.get('/:id', authmd, async (req, res) => {
 	const id = req.params;
-
+	console.log(id);
 	Trips
     .findMembers(id)
     .then(foundTrip => {
