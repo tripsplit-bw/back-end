@@ -3,6 +3,9 @@ exports.up = function(knex, Promise) {
 		tbl.increments();
 
 		tbl
+		.string('expense_name', 256).notNullable();
+
+		tbl
 			.integer('trip_id')
 			.unsigned()
 			.references('id')
@@ -10,9 +13,6 @@ exports.up = function(knex, Promise) {
 			.onDelete('CASCADE')
 			.onUpdate('CASCADE')
 			.notNullable()
-
-		tbl
-		.string('expense_name', 256).notNullable();
 
 		tbl
 		.float('expense_total')

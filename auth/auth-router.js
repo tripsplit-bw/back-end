@@ -20,11 +20,10 @@ router.post('/register', (req,res) => {
 	const hash = bcrypt.hashSync(user.password, 10)
 	user.password = hash;
 
-	Users.add(user)
+	Users.register(user)
 		.then(saved => {
-			const token = generateToken(user);
+			const token = getJwt(user);
 			res.status(201).json({
-			id: saved.id,
 			token,
 			message: `Welcome ${user.username}`
 			});
@@ -68,6 +67,22 @@ router.post('/login', (req, res) => {
 	}
 });
 
+router.post('/profile', (req, res) => {
+	let { last_name, first_name } = req.body;
+		last_name = last_name.toLowerCase();
+		first_name = first_name.toLowerCase();
+		Users.findBy({ username })
+			.first()
+			.then(user => {
+					res.status(200).json({
+						message: `Welcome, ${user.first_name}`,
+					});
+			})
+			.catch(err => {
+				res.status(500).json(err);
+			});
+});
+
 
 router.get('/logout', (req, res) => {
     if (req.session) {
@@ -89,9 +104,11 @@ router.get('/logout', (req, res) => {
 });
 
 
-function getJwt(username) {
+function getJwt(user) {
     const payload = {
-        username
+		subject:user.id,
+		username: user.username,
+
     };
 
     const secret = process.env.JWT_SECRET || 'is it secret, is it safe?';
