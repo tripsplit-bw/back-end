@@ -6,22 +6,22 @@ exports.seed = function(knex, Promise) {
 			// Inserts seed entries
 			return knex('Expenses').insert([
 				{
-					expense_id: 1,
-					trip_id: 3,
+					id: 1,
+					trip_id: 1,
 					description: 'Test 1',
-					amount: 1
+					expense_total: 1
 				},
 				{
-					expense_id: 2,
-					trip_id: 3,
+					id: 2,
+					trip_id: 2,
 					description: 'Test 2',
-					amount: 5
+					expense_total: 5
 				},
 				{
-					expense_id: 3,
+					id: 3,
 					trip_id: 3,
 					description: 'Test 3',
-					amount: 20
+					expense_total: 20
 				}
 			]);
 		});

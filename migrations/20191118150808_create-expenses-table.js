@@ -1,23 +1,21 @@
 exports.up = function(knex, Promise) {
 	return knex.schema.createTable('Expenses', tbl => {
-		tbl.increments('expense_id');
+		tbl.increments();
+
 		tbl
 			.integer('trip_id')
-			.references('trip_id')
-			.inTable('trips')
-			.notNullable()
+			.unsigned()
+			.references('id')
+			.inTable('Trips')
 			.onDelete('CASCADE')
-			.onUpdate('CASCADE');
-
-		tbl.string('description', 256).notNullable();
-		tbl.integer('amount').notNullable();
+			.onUpdate('CASCADE')
+			.notNullable()
 
 		tbl
-			.integer('countUsers')
-			.notNullable()
-			.defaultTo(0);
+		.string('expense_name', 256).notNullable();
 
-		tbl.integer('folksPaid');
+		tbl
+		.float('expense_total')
 	});
 };
 

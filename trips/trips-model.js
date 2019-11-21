@@ -1,110 +1,60 @@
 const db = require('../data/dbConfig');
 
 module.exports = {
+	find,
+	findBy,
+	findById,
+	findMembers,
+	findExpenses,
 	addTrip,
 	editTrip,
-	deleteTrip,
-	getTripByUser,
-	getTripById,
-	booleanTrip
+	deleteTrip
+}
+
+function find() {
+	return db('trips')
+}
+
+function findBy(filter){
+	return db('trips').where(filter);
 };
 
-function getTripByUser(create_trip) {
+function findById(id){
 	return db('trips')
-	.where({ create_trip});
+	.where({ id })
+	.first()
 }
 
-async function getTripById(trip_id) {
-	let trip = await db('trips')
-		.where({ trip_id })
-		.first();
-
-	let expenses = await db('expenses')
-		.join('trips', 'trips.trip_id', 'expenses.trip_id')
-		.where('expenses.trip_id', trip_id)
-		.select(
-			'expenses.expense_id',
-			'expenses.trip_id',
-			'expenses.description',
-			'expenses.amount'
-		);
-
-	let members = await db('expenseMembers')
-		.join('trips', 'trips.trip_id', 'expenseMembers.trip_id')
-		.where({
-			'expenseMembers.trip_id': trip_id,
-			'expenseMembers.expense_id': null
-		})
-		.select('expenseMembers.username', 'expenseMembers.paid');
-	
-
-	if (trip && expenses && members) {
-		return {
-			...trip,
-			expenses,
-			members
-		};
-	} else if (trip && expenses) {
-		return {
-			...trip,
-			expenses
-		};
-	} else if (trip && members) {
-		return {
-			...trip,
-			members
-		};
-	} else if (trip) {
-		return trip;
-	} else {
-		return false;
-	}
+function findMembers(id){
+	return db('trips')
+	.leftJoin('tripMembers', 'tripMembers.trip_id', 'trips.id')
+	.where('trips.id', id)
+	.select('trips.id as trip_id', 'trips.trip_name as trip_name', 'trips.user_id as tripOwner_id', 'trips.close_trip as close_trip', 'tripMembers.trip_username as trip_username', 'tripMembers.id as tripMembers_id', 'trips.start_date as start_date', 'trips.end_date as end_date')
 }
 
-async function addTrip(trip, authorName) {
+function findExpenses(id){
+	return db('trips')
+	.leftJoin('expense', 'expense.trip_id', 'trips.id')
+	.where('trips.id', id)
+}
+
+async function addTrip(trips){
 	const [id] = await db('trips')
-	.insert(trip, 'trip_id');
-	
-	const newExpMember = {
-		username: authorName,
-		trip_id: id
-	};
+	.insert(trips, 'id');
 
-	
-	const expenseMember = await db('expenseMembers')
-	.insert(newExpMember, 'id');
-
-	return getTripById(id);
+	return findById(id);
 }
 
-async function booleanTrip(trip_id) {
-	const oldStatus = await db('trips')
-		.select('completed')
-		.where({ trip_id })
-		.first();
+async function editTrip(id, changes){
+	await db('trips')
+	.where('id', id)
+	.update(changes)
 
-	const newStatus = await db('trips')
-		.where({ trip_id })
-		.update('completed', !oldStatus.completed);
-
-	return getTripById(trip_id);
+	return findById(id);
 }
 
-async function deleteTrip(trip_id) {
-	let deleted = await db('trips')
-		.where({ trip_id })
-		.first()
-		.del();
-
-	return deleted;
-}
-
-async function editTrip(trip_id, toBeNewTrip) {
-	let update = await db('trips')
-		.where({ trip_id })
-		.update(toBeNewTrip);
-
-	let newTrip = await getTripById(trip_id);
-
-	return newTrip;
+function deleteTrip(id){
+	return db('trips')
+	.where('id', id)
+	.del();
 }

@@ -15,28 +15,26 @@ router.get('/', (req, res) => {
     });
 });
 
-router.post('/register', (req, res) => {
-	let { username, password, email } = req.body;
+router.post('/register', (req,res) => {
+	let user = req.body;
+	const hash = bcrypt.hashSync(user.password, 10)
+	user.password = hash;
 
-	if (username && password && email) {
-		let user = req.body;
-		const hash = bcrypt.hashSync(user.password, 6);
-
-		user.password = hash;
-		user.username = user.username.toLowerCase();
-
-		Users.register(user)
-			.then(addsUser => {
-				res.status(201).json(addsUser);
-			})
-			.catch(err => {
-				res.send(err);
+	Users.add(user)
+		.then(saved => {
+			const token = generateToken(user);
+			res.status(201).json({
+			id: saved.id,
+			token,
+			message: `Welcome ${user.username}`
 			});
-	} else {
-		res.status(500).json({
-			message: 'username, password, and email required!'
-		});
-	}
+		})
+			.catch(err => {
+				console.log(err)
+				res.status(500).json({
+					message: 'username, password, and email required!'
+				});
+			});	
 });
 
 
@@ -48,13 +46,12 @@ router.post('/login', (req, res) => {
 			.first()
 			.then(user => {
 				if (user && bcrypt.compareSync(password, user.password)) {
-					const token = tokenService.getJwt(user);
-					// const token = getJwt(user.id);
+					const token = getJwt(user.id);
 					res.status(200).json({
 						message: `Welcome, ${user.username}`,
-						token
+						token,
+						id: user.id
 					});
-
 				} else {
 					res
 						.status(401)
@@ -70,6 +67,7 @@ router.post('/login', (req, res) => {
 			.json({ message: 'missing username or password' });
 	}
 });
+
 
 router.get('/logout', (req, res) => {
     if (req.session) {

@@ -1,21 +1,26 @@
 exports.up = function(knex, Promise) {
 	return knex.schema.createTable('Trips', tbl => {
-		tbl.increments('trip_id');
-		tbl.string('destination', 256).notNullable();
-		tbl.string('description', 256).notNullable();
+		tbl.increments();
+		tbl.boolean('close_trip')
+		tbl.string('destination', 256);
+		tbl.string('description', 256);
 
 		tbl
-			.integer('create_trip')
-			.references('id')
-			.inTable('users')
-			.notNullable()
-			.onDelete('CASCADE')
-			.onUpdate('CASCADE');
+		.string('trip_name', 255)
+		.notNullable();
+		tbl
+		.integer('user_id')
+		.unsigned()
+		.references('id')
+		.inTable('Users')
+		.onDelete('CASCADE')
+		.onUpdate('CASCADE')
 
-		tbl.date('trip_start');
+		tbl
+		.date('start_date')
 
-		tbl.date('trip_end');
-		tbl.boolean('completed').defaultTo(false);
+		tbl
+		.date('end_date')
 	});
 };
 

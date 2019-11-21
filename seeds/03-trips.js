@@ -6,25 +6,34 @@ exports.seed = function(knex, Promise) {
 			// Inserts seed entries
 			return knex('Trips').insert([
 				{
-					trip_id: 1,
+					id: 1,
+					trip_name: test1,
 					destination: 'Test Place 1',
+					close_trip: false,
 					description: 'Test Trip 1',
-					create_trip: 1,
-					trip_start: Date.now()
+					user_id: 1,
+					start_date: Date.now(),
+					end_date: Date.now()
 				},
 				{
-					trip_id: 2,
+					id: 2,
+					trip_name: test2,
 					destination: 'Test Place 2',
+					close_trip: false,
 					description: 'Test Trip 2',
-					create_trip: 3,
-					trip_start: Date.now()
+					user_id: 2,
+					start_date: Date.now(),
+					end_date: Date.now()
 				},
 				{
-					trip_id: 3,
+					id: 3,
+					trip_name: test3,
 					destination: 'Test Place 3',
+					close_trip: false,
 					description: 'Test Trip 3',
-					create_trip: 3,
-					trip_start: Date.now()
+					user_id: 3,
+					start_date: Date.now(),
+					end_date: Date.now()
 				}
 			]);
 		});

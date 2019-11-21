@@ -2,10 +2,12 @@ const db = require('../data/dbConfig');
 
 module.exports = {
     register,
-    remove,
+    deleteUser,
+    editUser,
     find,
     findBy,
     findById,
+    findByIdWTrip
 };
 
 function find() {
@@ -19,14 +21,8 @@ function findBy(filter) {
 }
 
 async function register(user) {
-    // const profile = {
-	// 	username: user.username
-	// };
     const [id] = await db('users')
-    .insert(user);
-
-    // const userProfile = await db('profiles')
-    // .insert(profile, 'username');
+    .insert(user, 'id');
 
 	return findById(id);
 }
@@ -37,7 +33,22 @@ function findById(id) {
         .first();
 }
 
-async function remove(id) {
+function findByIdWTrip(id){
+    return db('users')
+        .leftJoin('trips', 'trips.user_id', 'users.id')
+        .where('users.id', id)
+}
+
+async function editUser(id, changes){
+    await db('users')
+    .where('id', id)
+    .update(changes)
+
+    return findById(id);
+}
+
+
+async function deleteUser(id) {
     const [deleted] = await findById('id')
 
     await db('users')

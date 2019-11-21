@@ -2,182 +2,92 @@ const express = require('express');
 const Expenses = require('./expenses-model');
 const authmw = require('../auth/authenticate-middleware');
 
-const router = express.Router({ mergeParams: true });
+const router = express.Router();
 
 router.get('/', authmw, async (req, res) => {
-	const id = req.params.tripid;
-
-	try {
-		tripExs = await Expenses.findByTripId(id);
-		res.status(200).json(tripExs);
-	} catch (err) {
-		res.status(500).json(err);
-	}
-});
-
-router.get("/:id", authmw, async (req, res) => {
-	const id = req.params.id;
-
-	try {
-		let expenses = await Expenses.findByExpenseId(id);
-
-		res.status(200).json(expenses);
-	} catch (err) {
+	Expenses
+		.find()
+		.then(expense => {
+			res.json(expense)
+		})
+    .catch(err => {
 		res.status(500).json({ err });
-	}
+    })
 });
 
-// Get members who belong to that expense via expense id.
-// router.get("/:id/members", authmw, async (req, res) => {
-// 	const id = req.params.id;
-
-// 	try {
-// 		let expMembers = await ExpenseMembers.getExpenseMembers(id);
-
-// 		res.status(200).json(expMembers);
-// 	} catch (err) {
-// 		res.status(500).json(err);
-// 	}
-// });
-
-// Add members to specific expense via expense id. Requires username of registered user.
-// router.post("/:id/members", authmw, async (req, res) => {
-// 	const expense_id = req.params.id;
-// 	const trip_id = req.params.tripid;
-
-// 	let { username } = req.body;
-
-// 	if (username) {
-// 		try {
-// 			let newExpMemList = await ExpenseMembers.addMemberToExpense(
-// 				expense_id,
-// 				trip_id,
-// 				username
-// 			);
-
-// 			res.status(201).json(newExpMemList);
-// 		} catch (err) {
-// 			res.status(500).json({ err });
-// 		}
-// 	} else {
-// 		res.status(400).json({
-// 			message: "A username is required to add a friend to an expense."
-// 		});
-// 	}
-// });
-
-// Toggle specific individual's payment status on specific expense via expense id and individual's username.
-// router.post("/:id/members/paid", authmw, async (req, res) => {
-// 	const expense_id = req.params.id;
-// 	const trip_id = req.params.tripid;
-
-// 	let { username } = req.body;
-
-// 	if (username) {
-// 		try {
-// 			let newExpMemList = await ExpenseMembers.boolPaidStatus(
-// 				expense_id,
-// 				trip_id,
-// 				username
-// 			);
-
-// 			res.status(201).json(newExpMemList);
-// 		} catch (err) {
-// 			res.status(500).json({ err });
-// 		}
-// 	} else {
-// 		res.status(400).json({
-// 			message: "A username is required to update expense payment status."
-// 		});
-// 	}
-// });
-
-// // Delete specific individual from specific expense via expense id and individual's username.
-// router.delete("/:id/members", authmw, async (req, res) => {
-// 	const expense_id = req.params.id;
-// 	const trip_id = req.params.tripid;
-
-// 	let { username } = req.body;
-
-// 	if (username) {
-// 		try {
-// 			let itemToDel = await ExpenseMembers.removeMemberFromExpense(
-// 				expense_id,
-// 				trip_id,
-// 				username
-// 			);
-
-// 			res.status(200).json(itemToDel);
-// 		} catch (error) {
-// 			res.status(500).json(err);
-// 		}
-// 	} else {
-// 		res
-// 			.status(404)
-// 			.json({ message: "Must provide username to delete user from expense" });
-// 	}
-// });
+router.get('/:id', authmw, async (req, res) => {
+	Expense
+    .findMembers(id)
+    .then(expense => {
+		let expenseWithMembers = expense.map(expenseMember =>{
+			let expenseMember_id = expenseMember.expenseMember_id;
+			let member = expenseMember.expense_username;
+			let amountPaid = expenseMember.expense_amount_paid;
+			let memberInfo = {
+				expenseMember_id: expenseMember_id,
+				expenseMemberName: member,
+				amountPaid: amountPaid
+			}
+			return memberInfo
+		})
+	const memberData ={
+        expense_id: expense[0].expense_id,
+        trip_id: expense[0].trip_id,
+        expense_total: expense[0].expense_total,
+        expense_name: expense[0].expense_name,
+        expenseMember: expenseWithMembers
+	}
+		res.json(memberData)
+    })
+	.catch(err => {
+		console.log(err)
+		res.status(500).json({ err });
+	})
+});
 
 
 router.post('/', authmw, async (req, res) => {
-	expense = req.body;
-	const trip_id = req.params.tripid;
-	const authorName = req.headers.userName;
+	let expense = req.body;
 
-	let { description, amount } = req.body;
-
-	expense = {
-		...expense,
-		trip_id: trip_id
-	};
-
-	if (trip_id && description && amount) {
-		let newEx = await Expenses.addExpenseToTrip(expense, authorName);
-
-		try {
-			res.status(201).json(newEx);
-		} catch (err) {
+	Expenses
+		.addExpense(expense)	
+		.then(expense =>{
+			res.status(200).json(expense)
+		})
+		.catch (err => {
 			res.status(500).json(err);
-		}
-	} else {
-		res.status(500).json({
-			message:
-				'please add a description and an amount'
-		});
-	}
+		})
 });
 
 
 router.delete('/:id', authmw, async (req, res) => {
-	const id = req.params.id;
+	const id = req.params;
 
-	try {
-		let deleted = await Expenses.deleteExpense(id);
-
-		if (deleted === 1) {
-			res.status(201).json({ message: `Expense deleted!` });
-		} else {
-			res.status(404).json({
-				message: `No expense found to delete`
-			});
-		}
-	} catch (err) {
-		res.status(500).json(err);
-	}
+	Expenses
+		.deleteExpense(id)
+		.then(expense => {
+			res.status(200).json(expense)
+		})
+	
+		.catch (err => {
+			res.status(500).json(err);
+		})
 });
 
 
 router.put('/:id', authmw, async (req, res) => {
-	const id = req.params.id;
-	let toBeNewExpense = req.body;
+	const id = req.params;
+	const newExpense = req.body;
 
-	try {
-		let newExpense = await Expenses.updateExpense(id, toBeNewExpense);
+	Expense
+		.editExpense(id, newExpense)
+		.then(editedData => {
+			res.status(200).json(editedData)
+		})
 
-		res.status(201).json(newExpense);
-	} catch (err) {
+	.catch (err => {
 		res.status(500).json(err);
-	}
+	})
 });
 
 module.exports = router;

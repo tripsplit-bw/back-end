@@ -1,146 +1,106 @@
 const express = require('express');
 const Trips = require('../trips/trips-model');
-const TripExpenses = require('../expenses/expenses-model');
 const authmd = require('../auth/authenticate-middleware');
 
 const router = express.Router();
 
 router.get('/', authmd, async (req, res) => {
-	const creatorId = req.headers.userId;
-
-	try {
-		const trips = await Trips.getTripByCreator(creatorId);
-
-		res.status(200).json({ trips });
-	} catch (err) {
+	Trips
+    .find()
+    .then(trips => {
+		res.json(trips)
+    })
+	.catch (err => {
 		res.status(500).json({ message: 'server error', err });
-	}
+	})
 });
 
-// router.get('/:id', authmd, async (req, res) => {
-// 	const id = req.params.id;
-
-// 	try {
-// 		const trip = await Trips.getTripById(id);
-// 		if (trip) {
-// 			const tripMembers = await TripMembers.getTripMembers(id);
-
-// 			res.status(200).json(trip);
-// 		} else {
-// 			res.status(404).json({ message: 'trip not found' });
-// 		}
-// 	} catch (err) {
-// 		res.status(500).json(err);
-// 	}
-// });
-
-// router.get('/:id/members', authmd, async (req, res) => {
-// 	const id = req.params.id;
-
-// 	try {
-// 		let tripMembers = await TripMembers.getTripMembers(id);
-// 		res.status(200).json(tripMembers);
-// 	} catch (error) {
-// 		res.status(500).json({ error });
-// 	}
-// });
-
-// router.post('/:id/members', authmd, async (req, res) => {
-// 	const id = req.params.id;
-// 	let { username } = req.body;
-
-// 	if (username) {
-// 		try {
-// 			let tripMembers = await TripMembers.addMemberToTrip(id, username);
-// 			res.status(201).json(tripMembers);
-// 		} catch (error) {
-// 			res.status(500).json(error);
-// 		}
-// 	} else {
-// 		res.status(400).json({
-// 			message: 'Needs username'
-// 		});
-// 	}
-// });
 
 
-// router.delete(':/id/members', authmd, async (req, res) => {
-// 	const trip_id = req.params.id;
-// 	let { username } = req.body;
+router.get('/:id', authmd, async (req, res) => {
+	const id = req.params;
 
-// 	if (username) {
-// 		try {
-// 			let tripMembers = await TripMembers.removeMemberFromTrip(
-// 				trip_id,
-// 				username
-// 			);
-// 			res.status(201).json(tripMembers);
-// 		} catch (error) {
-// 			res.status(500).json(error);
-// 		}
-// 	} else {
-// 		res.status(400).json({
-// 			message:
-// 				'missing username'
-// 		});
-// 	}
-// });
-
-
-router.get('/:id/updateStatus', authmd, async (req, res) => {
-	const id = req.params.id;
-
-	try {
-		const updatedStatus = await Trips.boolTripStatus(id);
-
-		res.status(200).json(updatedStatus);
-	} catch (err) {
+	Trips
+    .findMembers(id)
+    .then(foundTrip => {
+		let tripWithMembers = foundTrip.map(trip =>{
+        let tripMember_id = trip.tripMembers_id
+        let member = trip.trip_username
+        let tripMember = {
+			tripMember_id: tripMember_id,
+			member_username: member
+        }
+        return tripMember
+	})
+	const tripData = {
+        trip_id: foundTrip[0].trip_id,
+        trip_name: foundTrip[0].trip_name,
+        trip_owner_id: foundTrip[0].tripOwner_id,
+        trip_close_trip: foundTrip[0].close_trip,
+        trip_start_date: foundTrip[0].start_date,
+        trip_end_date: foundTrip[0].end_date,
+        trip_members: tripWithMembers
+    }
+		return tripData
+    })
+    .then(tripData =>{
+		Trips
+			.findExpenses(tripData.trip_id)
+			.then(tripExpenses => {
+				const thisTripExpenses = tripExpenses.map(expense => {
+					let id = expense.id
+					let trip_expense_name = expense.expense_name
+					let expense_total = expense.expense_total
+					let expenseInfo = {
+						expense_id: id,
+						expense_name: trip_expense_name,
+						expense_total: expense_total
+					}
+						return expenseInfo
+					})
+			const tripWithExpenseData = {
+				trip_id: tripData.trip_id,
+				trip_name: tripData.trip_name,
+				trip_owner_id: tripData.trip_owner_id,
+				trip_close_trip: tripData.trip_close_trip,
+				trip_start_date: tripData.trip_start_date,
+				trip_end_date: tripData.trip_end_date,
+				trip_members: tripData.trip_members,
+				expenseInfo: thisTripExpenses
+			}
+			res.json(tripWithExpenseData)
+			})
+	})
+	.catch (err => {
 		res.status(500).json(err);
-	}
+	})
 });
 
-router.post('/addTrip', authmd, async (req, res) => {
-	const authorID = req.headers.userID;
-	const authorName = req.headers.userName;
-	let { description, trip_start, trip_end } = req.body;
+router.post('/', authmd, async (req, res) => {
+	let trip = req.body;
 
-	if (description) {
-		trip = {
-			trip_creator: authorID,
-			description: description,
-			trip_start: trip_start,
-			trip_end: trip_end
-		};
-
-		try {
-			const tripAdded = await Trips.addTrip(trip, authorName);
-			res.status(201).json(tripAdded);
-		} catch (err) {
+	Trips
+		.addTrip(trip)
+		.then(trip =>{
+			res.status(200).json(trip)
+		})
+		.catch (err => {
 			res.status(500).json({ message: 'database error', err });
-		}
-	} else {
-		res.status(500).json({ message: 'description required' });
-	}
+		})	
 });
 
 
 router.delete('/:id', authmd, async (req, res) => {
-	const id = req.params.id;
+	const id = req.params;
 
-	try {
-		let toDelete = await Trips.deleteTrip(id);
-		if (toDelete === 1) {
-			res
-				.status(200)
-				.json({ message: `Your trip has been deleted successfully!` });
-		} else {
-			res.status(404).json({
-				message: `Trip could not be deleted.`
-			});
-		}
-	} catch (error) {
-		res.status(500).json(error);
-	}
+	Trips
+    .deleteTrip(id)
+    .then(trip => {
+		res.status(200).json(trip)
+    })
+	.catch (err => {
+		res.status(500).json(err);
+	})
 });
 
 
@@ -148,12 +108,14 @@ router.put('/:id', authmd, async (req, res) => {
 	const id = req.params.id;
 	let tripUpdates = req.body;
 
-	try {
-		let newTrip = await Trips.updateTrip(id, tripUpdates);
-		res.status(202).json(newTrip);
-	} catch (error) {
+	Trips
+	.editTrip(id, tripUpdates)
+	.then(editedData => {
+		res.status(200).json(editedData)
+	})
+	.catch (err => {
 		res.status(500).json({ err });
-	}
+	})
 });
 
 module.exports = router;

@@ -11,7 +11,7 @@ exports.up = function(knex, Promise) {
 		tbl
 			.foreign('username')
 			.references('username')
-			.inTable('users');
+			.inTable('Users');
 	});
 };
 
