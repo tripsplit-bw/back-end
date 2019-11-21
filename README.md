@@ -12,9 +12,9 @@ Tables Content:
 - [Users](#Users)
 - [Profile](#Profile)
 - [Trips](#Trips)
-- [Trip Members](#Trip Members)
+- [Trip Members](#TripMembers)
 - [Expenses](#Expenses)
-- [Member Expenses](#Member Expenses)
+- [Member Expenses](#MemberExpenses)
 
 
 ### Users
