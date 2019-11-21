@@ -12,7 +12,9 @@ Tables Content:
 - [Users](#Users)
 - [Profile](#Profile)
 - [Trips](#Trips)
+- [Trip Members](#Trip Members)
 - [Expenses](#Expenses)
+- [Member Expenses](#Member Expenses)
 
 
 ### Users
@@ -22,42 +24,61 @@ Tables Content:
 | id       | integer| yes      | yes    | User's id |
 | username | string | yes      | yes    | User's username |
 | password | string | yes      | no     | User's hashed password |
-| email    | string | yes      | yes    | User's email |
+| email    | string | yes      | no     | User's email |
 
 
 ### Profile
 
 | Name      | Type    | Required | Unique | Notes |
 | --------- | ------  | -------- | ------ | ----- |
-| profile_id| integer | yes      | yes    | profile's id |
-| username  | string  | yes      | yes    | User's username|
-| first_name| string  | no      | yes    | user's name |
-| last_name | string  | no      | yes    | user's last name |
+| profile_id| integer | yes      | yes    | profile's id - referenced from user table|
+| username  | string  | yes      | yes    | User's username - referenced from user table|
+| first_name| string  | no       | yes    | user's name |
+| last_name | string  | no       | yes    | user's last name |
 
 
 ### Trips
 
-| Name      | Type    | Required | Unique | Notes |
-| --------- | ------  | -------- | ------ | ----- |
-| trip_id   | integer | yes      | yes    | Trip id |
-| destination| string | yes      | yes    | Trip's destination |
-| description| string | yes      | yes    | Trip description/comments |
-| create_trip| integer| yes      | yes    | create trip |
-| trip_start| date    | no       | yes    | Start Date |
-| trip_end  | date    | no       | yes    | End Date |
-| completed | expenses| no       | yes    | Completed: Yes/No|
+| Name        | Type    | Required | Unique | Notes |
+| ---------   | ------  | -------- | ------ | ----- |
+| trip_id     | integer | yes      | yes    | Trip id |
+| destination | string  | no       | no     | Trip's destination |
+| trip_name   | string  | yes      | no     | Trip description/comments |
+| trip_start  | date    | no       | no     | Start Date |
+| trip_end    | date    | no       | no     | End Date |
+| close_trip  | boolean | no       | no     | Completed: Yes/No|
+
+
+### Trip Members
+
+| Name         | Type    | Required | Unique | Notes |
+| ---------    | ------  | -------- | ------ | ----- |
+| id           | integer | yes      | yes    | Trip member id |
+| trip_id      | integer | yes      | yes    | Trip id |
+| trip_username| string  | no       | no     | Trip username - referencing |
+
 
 
 ### Expenses
 
-| Name        | Type    | Required | Unique | Notes |
-| ----------- | ------  | -------- | ------ | ----- |
-| expense_id  | integer | yes      | yes    | expense id |
-| trip_id     | integer | yes      | yes    | Trip ID |
-| description | string  | yes      | no     | Trip description/comments |
-| amount      | integer | yes      | no     | Trip total amount |
-| countUsers  | integer | yes      | no     | Number of people on trip |
-| folksPaid   | integer | no       | no     | Number of people that paid |
+| Name         | Type    | Required | Unique | Notes |
+| -----------  | ------  | -------- | ------ | ----- |
+| id  	       | integer | yes      | yes    | expense id |
+| trip_id      | integer | yes      | no     | Trip ID |
+| expense_name | string  | yes      | no     | Trip description/comments |
+| expense_total| integer | no       | no     | Trip total amount |
+
+
+### Member Expenses
+
+| Name               | Type    | Required | Unique | Notes |
+| -----------        | ------  | -------- | ------ | ----- |
+| id  	             | integer | yes      | yes    | id |
+| expense_username   | string  | no       | no     | username for particular expense |
+| expense_id         | integer | no       | no     | expense id|
+| expense_amount_paid| float   | no       | no     | Amount Paid|
+
+
 
 
 
@@ -115,7 +136,7 @@ If successful, it will return with a `200` HTTP status.
 
 
 ### Profile
-https://bw-trip-split.herokuapp.com/api/profile/:id
+https://bw-trip-split.herokuapp.com/api/profile/
 
 Expects an object with this format as the request body:
 ```
@@ -133,11 +154,9 @@ Expects an object with this format as the request body:
 ### Trips
 https://bw-trip-split.herokuapp.com/api/trips
 
-To update if completed:
-https://bw-trip-split.herokuapp.com/api/trips/:id/updateStatus
+Get/Edit/Delete by id:
+https://bw-trip-split.herokuapp.com/api/trips/:id
 
-To add a trip:
-https://bw-trip-split.herokuapp.com/api/trips/addTrip
 
 Expects an object with this format as the request body:
 
@@ -147,15 +166,25 @@ Expects an object with this format as the request body:
 {
 	trip_id: 1,
 	destination: 'Test Place 1',
-	description: 'Test Trip 1',
-	create_trip: 1,
-	trip_start: Date.now()
+	close_trip: false,
+	trip_name: 'Test Trip 1',
+	trip_start: Date.now(),
+	trip_end: Date.now()
 }
 ```
 
+### Trip Members
+https://bw-trip-split.herokuapp.com/api/tripMembers
+
+Get/Edit/Delete by id:
+https://bw-trip-split.herokuapp.com/api/tripMembers/:id
+
 
 ### Expenses
-https://bw-trip-split.herokuapp.com/api/:tripid/expenses/
+https://bw-trip-split.herokuapp.com/api/expenses/
+
+Get/Edit/Delete by id:
+https://bw-trip-split.herokuapp.com/api/expenses/:id
 
 Expects an object with this format as the request body:
 
@@ -163,12 +192,18 @@ Expects an object with this format as the request body:
   --header "Content-Type: application/json"
   --data: 
 {
-	expense_id: 1,
-	trip_id: 3,
-	description: 'Test 1',
-	amount: 1
+	id: 1,
+	trip_id: 1,
+	expense_name: 'thing1',
+	expense_total: 1
 }
 ```
+
+### Member Expenses
+https://bw-trip-split.herokuapp.com/api/expenseMembers/
+
+Get/Edit/Delete by id:
+https://bw-trip-split.herokuapp.com/api/expenseMembers/:id
 
 
 
